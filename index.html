@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TxSwap - Advanced DEX</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Internal Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Network Error Banner -->
+        <div id="networkError" class="network-error">
+            <p>You are not connected to Base Sepolia network. Please switch network in your wallet.</p>
+            <button id="addNetwork" class="add-network-btn">Add Base Sepolia Network</button>
+        </div>
+
+        <header>
+            <div class="logo">
+                <i class="fas fa-exchange-alt"></i>
+                <span>TxSwap</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="#" class="active" data-tab="swap">Swap</a>
+                <a href="#" data-tab="pool">Pool</a>
+                <a href="#" data-tab="vote">Vote</a>
+                <a href="#" data-tab="charts">Charts</a>
+            </div>
+            
+            <div class="network-badge">Base Sepolia</div>
+            
+            <div class="wallet-section">
+                <div id="walletAddress" class="wallet-address"></div>
+                <button id="connectWallet" class="wallet-btn">Connect Wallet</button>
+            </div>
+            
+            <button id="themeToggle" class="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <main class="main-content">
+            <div class="left-panel">
+                <div class="swap-card" id="swapCard">
+                    <div class="card-header">
+                        <h2 class="card-title">Swap</h2>
+                        <button class="settings-btn" id="settingsBtn">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-label">
+                            <span>From</span>
+                            <span>Balance: <span id="fromBalance">0</span></span>
+                        </div>
+                        <div class="token-input">
+                            <input type="number" id="amountIn" placeholder="0.0">
+                            <div class="token-select" id="fromTokenSelect">
+                                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH">
+                                <span id="fromToken">ETH</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="switch-btn">
+                        <div class="switch-icon" id="switchTokensBtn">
+                            <i class="fas fa-arrow-down-arrow-up"></i>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-label">
+                            <span>To</span>
+                            <span>Balance: <span id="toBalance">0</span></span>
+                        </div>
+                        <div class="token-input">
+                            <input type="number" id="amountOut" placeholder="0.0" readonly>
+                            <div class="token-select" id="toTokenSelect">
+                                <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+                                <span id="toToken">USDC</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swap-info">
+                        <div class="info-row">
+                            <span class="info-label">Price</span>
+                            <span id="price">0 USDC per ETH</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Minimum received</span>
+                            <span id="minReceived">0 USDC</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Fee (0.3%)</span>
+                            <span id="feeAmount">0 USDC</span>
+                        </div>
+                    </div>
+
+                    <div id="transactionStatus" class="transaction-status"></div>
+
+                    <button id="swapButton" class="swap-btn" disabled>Connect Wallet</button>
+                </div>
+
+                <div class="swap-card pool-card" id="poolCard">
+                    <div class="card-header">
+                        <h2 class="card-title">Liquidity Pools</h2>
+                    </div>
+
+                    <div class="tabs">
+                        <div class="tab active" data-pool-tab="add">Add Liquidity</div>
+                        <div class="tab" data-pool-tab="remove">Remove Liquidity</div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-label">
+                            <span>Token 1</span>
+                            <span>Balance: <span id="poolBalance1">0</span></span>
+                        </div>
+                        <div class="token-input">
+                            <input type="number" id="poolAmount1" placeholder="0.0">
+                            <div class="token-select" id="poolToken1Select">
+                                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH">
+                                <span id="poolToken1">ETH</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-label">
+                            <span>Token 2</span>
+                            <span>Balance: <span id="poolBalance2">0</span></span>
+                        </div>
+                        <div class="token-input">
+                            <input type="number" id="poolAmount2" placeholder="0.0">
+                            <div class="token-select" id="poolToken2Select">
+                                <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC">
+                                <span id="poolToken2">USDC</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swap-info">
+                        <div class="info-row">
+                            <span class="info-label">Share of Pool</span>
+                            <span id="poolShare">0%</span>
+                        </div>
+                    </div>
+
+                    <button id="addLiquidityBtn" class="swap-btn">Add Liquidity</button>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="swap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Price Chart</h2>
+                        <div>
+                            <span>1 ETH = 1950 USDC</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="swap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Transactions</h2>
+                    </div>
+                    <div class="transaction-list" id="transactionList">
+                        <div class="info-row">
+                            <span class="info-label">No recent transactions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <div class="modal" id="tokenModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Select a token</h3>
+                    <button class="close-modal" id="closeTokenModal">&times;</button>
+                </div>
+                <div class="token-list">
+                    <div class="token-item" data-token="ETH">
+                        <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="ETH" class="token-icon">
+                        <div class="token-info">
+                            <div class="token-symbol">ETH</div>
+                            <div class="token-name">Ethereum</div>
+                        </div>
+                    </div>
+                    <div class="token-item" data-token="USDC">
+                        <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC" class="token-icon">
+                        <div class="token-info">
+                            <div class="token-symbol">USDC</div>
+                            <div class="token-name">USD Coin</div>
+                        </div>
+                    </div>
+                    <div class="token-item" data-token="DAI">
+                        <img src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png" alt="DAI" class="token-icon">
+                        <div class="token-info">
+                            <div class="token-symbol">DAI</div>
+                            <div class="token-name">Dai Stablecoin</div>
+                        </div>
+                    </div>
+                    <div class="token-item" data-token="WBTC">
+                        <img src="https://cryptologos.cc/logos/wrapped-bitcoin-wbtc-logo.png" alt="WBTC" class="token-icon">
+                        <div class="token-info">
+                            <div class="token-symbol">WBTC</div>
+                            <div class="token-name">Wrapped Bitcoin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Transaction Settings</h3>
+                    <button class="close-modal" id="closeSettingsModal">&times;</button>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label class="setting-label">Slippage tolerance</label>
+                        <div class="slippage-options">
+                            <div class="slippage-option" data-slippage="0.1">0.1%</div>
+                            <div class="slippage-option active" data-slippage="0.5">0.5%</div>
+                            <div class="slippage-option" data-slippage="1">1%</div>
+                            <input type="number" class="slippage-input" id="slippageInput" placeholder="0.5">
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label">Transaction deadline</label>
+                        <input type="number" class="slippage-input" id="deadlineInput" value="20"> minutes
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>TxSwap &copy; 2023 - A Uniswap-inspired DEX on Base Sepolia</p>
+        </footer>
+    </div>
+
+    <!-- Internal Scripts -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/web3.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
